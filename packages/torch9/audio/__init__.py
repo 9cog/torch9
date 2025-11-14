@@ -22,10 +22,10 @@ __all__ = [
 
 class AudioTransform:
     """Base class for audio transformations."""
-    
+
     def __init__(self, sample_rate: int = 16000):
         self.sample_rate = sample_rate
-    
+
     def __call__(self, waveform):
         """Apply transformation to audio waveform."""
         return waveform
@@ -34,23 +34,24 @@ class AudioTransform:
 def load_audio(path: str, sample_rate: Optional[int] = None):
     """
     Load audio file from path.
-    
+
     Args:
         path: Path to audio file
         sample_rate: Target sample rate for resampling
-        
+
     Returns:
         Tuple of (waveform, sample_rate)
     """
     # Placeholder implementation - would integrate with torchaudio
     import torch
+
     return torch.randn(1, 16000), sample_rate or 16000
 
 
 def save_audio(path: str, waveform, sample_rate: int = 16000):
     """
     Save audio waveform to file.
-    
+
     Args:
         path: Output path for audio file
         waveform: Audio waveform tensor

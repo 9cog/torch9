@@ -10,7 +10,7 @@ This module provides:
 Optimized for fine-tuning large language models efficiently.
 """
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 __all__ = [
     "FineTuner",
@@ -20,7 +20,7 @@ __all__ = [
 
 class LoRAConfig:
     """Configuration for LoRA fine-tuning."""
-    
+
     def __init__(
         self,
         rank: int = 8,
@@ -36,7 +36,7 @@ class LoRAConfig:
 
 class FineTuner:
     """Fine-tuning manager for large language models."""
-    
+
     def __init__(
         self,
         model_name: str,
@@ -44,7 +44,7 @@ class FineTuner:
     ):
         self.model_name = model_name
         self.config = config or LoRAConfig()
-    
+
     def train(
         self,
         dataset: Any,
@@ -54,13 +54,13 @@ class FineTuner:
     ) -> Dict[str, Any]:
         """
         Fine-tune model on dataset.
-        
+
         Args:
             dataset: Training dataset
             num_epochs: Number of training epochs
             batch_size: Batch size for training
             learning_rate: Learning rate
-            
+
         Returns:
             Training metrics
         """
@@ -70,7 +70,7 @@ class FineTuner:
             "accuracy": 0.85,
             "epochs": num_epochs,
         }
-    
+
     def evaluate(self, dataset: Any) -> Dict[str, float]:
         """Evaluate model on dataset."""
         # Placeholder implementation

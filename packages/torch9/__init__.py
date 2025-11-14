@@ -16,7 +16,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "audio",
-    "vision", 
+    "vision",
     "text",
     "rl",
     "rec",
@@ -29,7 +29,7 @@ __all__ = [
 def __getattr__(name: str):
     """Lazy import submodules to avoid unnecessary dependencies."""
     import importlib
-    
+
     if name in __all__:
         # Dynamically import the submodule
         module = importlib.import_module(f".{name}", __name__)
