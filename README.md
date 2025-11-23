@@ -3,13 +3,15 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE)
 
-A cohesive monorepo integrating all major PyTorch domain libraries into a unified, easy-to-use package.
+A cohesive monorepo integrating all major PyTorch domain libraries into a unified, easy-to-use package. Also includes the complete original Torch7 framework and ecosystem (46 repositories) for historical reference and legacy support.
 
 ## 🌟 Overview
 
 `torch9` brings together the entire PyTorch ecosystem of domain-specific libraries under one roof, providing a seamless experience for deep learning practitioners working across multiple domains.
 
 ### Integrated Libraries
+
+#### Modern PyTorch Domain Libraries
 
 - **🔊 torch9.audio** - Audio signal processing and deep learning (torchaudio)
 - **👁️ torch9.vision** - Computer vision models and transformations (torchvision)
@@ -19,6 +21,15 @@ A cohesive monorepo integrating all major PyTorch domain libraries into a unifie
 - **🔧 torch9.tune** - Fine-tuning workflows for LLMs (torchtune)
 - **📊 torch9.data** - Flexible data loading pipelines (torchdata)
 - **🎬 torch9.codec** - Fast media encoding/decoding (torchcodec)
+
+#### Original Torch7 Framework
+
+The monorepo also includes all 46 repositories from the original Torch organization, providing:
+- **📚 Historical Reference** - Complete Torch7 framework source code
+- **🔧 Legacy Support** - Original Lua-based machine learning framework
+- **🎓 Learning Resource** - Understanding the evolution from Torch7 to PyTorch
+
+For details, see [torch/README.md](torch/README.md).
 
 ## 🚀 Installation
 
@@ -203,6 +214,13 @@ torch9/
 │       ├── tune/           # LLM fine-tuning
 │       ├── data/           # Data loading
 │       └── codec/          # Media encoding/decoding
+├── torch/                  # Original Torch7 framework (46 repos)
+│   ├── torch7/             # Main Torch7 framework
+│   ├── nn/                 # Neural networks
+│   ├── optim/              # Optimization algorithms
+│   ├── image/              # Image processing
+│   ├── tutorials/          # Torch7 tutorials
+│   └── ...                 # 41+ more repositories
 ├── tests/                  # Unit tests
 ├── examples/               # Usage examples
 ├── docs/                   # Documentation
