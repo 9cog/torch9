@@ -129,11 +129,16 @@ function Reservoir:updateOutput(input)
    -- Ensure state has correct size
    if batchSize then
       if self.state:dim() == 1 then
-         self.state = self.state:view(1, -1):expandAs(torch.Tensor(batchSize, self.reservoirSize))
+         -- Expand single state to batch size with independent storage
+         local expandedState = torch.Tensor(batchSize, self.reservoirSize)
+         for i = 1, batchSize do
+            expandedState[i]:copy(self.state)
+         end
+         self.state = expandedState
       end
    else
       if self.state:dim() == 2 then
-         self.state = self.state[1]
+         self.state = self.state[1]:clone()
       end
    end
    
@@ -209,13 +214,13 @@ function Reservoir:accGradParameters(input, gradOutput, scale)
       -- Batch mode
       for i = 1, batchSize do
          local extendedState = torch.cat(input[i]:view(-1), self.state[i]:view(-1))
-         self.gradWout:addr(scale, gradOutput[i]:view(-1, 1), extendedState:view(1, -1))
+         self.gradWout:addr(scale, gradOutput[i]:view(-1), extendedState:view(-1))
          self.gradBias:add(scale, gradOutput[i]:view(-1))
       end
    else
       -- Single sample
       local extendedState = torch.cat(input:view(-1), self.state:view(-1))
-      self.gradWout:addr(scale, gradOutput:view(-1, 1), extendedState:view(1, -1))
+      self.gradWout:addr(scale, gradOutput:view(-1), extendedState:view(-1))
       self.gradBias:add(scale, gradOutput:view(-1))
    end
 end
