@@ -2,177 +2,160 @@
 
 ## Project Overview
 
-**torch9** is a unified monorepo integrating all major PyTorch domain libraries into a single cohesive package, plus the complete original Torch7 framework (46 repositories) for historical reference.
+**torch9** is a unified Python monorepo integrating all major PyTorch domain libraries into a single package, plus the original Torch7 framework (46 repositories) as a historical reference. Version 0.1.0 (Alpha).
 
-### Repository URL
-https://github.com/9cog/torch9
+Repository: https://github.com/9cog/torch9
 
-## Quick Reference
+## Directory Layout
 
-### Key Directories
 ```
-packages/torch9/          # Main Python package (10 modules)
-torch/                    # Original Torch7 framework (46 repos, ~274MB)
-tests/                    # Test suite (149 tests, 74% coverage)
-examples/                 # Usage examples (3 files)
-docs/                     # Documentation (ARCHITECTURE.md, QUICKSTART.md)
-```
-
-### Core Package Structure
-```
-packages/torch9/
-├── __init__.py           # Main entry with lazy loading
-├── audio/                # Audio processing (torchaudio integration)
-├── vision/               # Computer vision (torchvision integration)
-├── text/                 # NLP utilities (torchtext)
-├── rl/                   # Reinforcement learning (torchrl)
-├── rec/                  # Recommender systems (torchrec)
-├── tune/                 # LLM fine-tuning (torchtune)
-├── data/                 # Data loading (torchdata)
-├── codec/                # Media codec (torchcodec)
-├── logic/                # Tensor Logic Framework (validation, ops, device mgmt)
-└── algo/                 # Master Algorithm Framework (pipelines, scheduling)
+packages/torch9/          # Main Python package (11 modules, ~5,200 LOC)
+  __init__.py             # Entry point with lazy loading via __getattr__
+  audio/                  # torchaudio integration (MelSpectrogram, MFCC, Resample)
+  vision/                 # torchvision integration (ResNet, VGG, EfficientNet, transforms)
+  text/                   # torchtext (Tokenizer, TextDataset)
+  rl/                     # torchrl (Environment, Policy, Agent)
+  rec/                    # torchrec (EmbeddingTable, RecommenderModel)
+  tune/                   # torchtune (LoRAConfig, FineTuner)
+  data/                   # torchdata (DataPipeline, DataLoader)
+  codec/                  # torchcodec (VideoDecoder, AudioDecoder)
+  logic/                  # Tensor Logic Framework (TensorSpec, TensorGuard, TensorOps, DeviceManager, MemoryTracker)
+  algo/                   # Master Algorithm Framework (Algorithm, Pipeline, Step, Scheduler, Registry, Branch/Merge/Loop)
+  luatorch/               # Unified LuaTorch/Torch7 core (nn, optim, typed tensors, serialization)
+torch/                    # Original Torch7 (46 repos, ~274MB) - READ ONLY, historical reference
+tests/                    # 264 tests across 10 files (conftest.py + 9 test modules)
+examples/                 # 3 working examples (multimodal, RL, recommender)
+docs/                     # ARCHITECTURE.md, QUICKSTART.md
+.github/workflows/        # CI/CD (tests.yml)
 ```
 
 ## Development Commands
 
-### Installation
+### Setup
+
 ```bash
-pip install -e ".[dev,all]"    # Full dev setup
-pip install -e ".[audio]"      # With specific domain
+pip install -e ".[dev,all]"    # Full dev install (all domains + dev tools)
+pip install -e ".[dev]"        # Dev tools only (no domain extras)
+pip install -e ".[audio]"      # Specific domain
 ```
 
-### Testing
+### Running Tests
+
 ```bash
-pytest tests/ -v --cov=torch9  # Run all tests with coverage
-pytest tests/test_audio.py     # Run specific test file
+# PYTHONPATH is needed so pytest resolves torch9 from packages/
+PYTHONPATH=packages pytest tests/ -v                          # All tests
+PYTHONPATH=packages pytest tests/ -v --cov=torch9             # With coverage
+PYTHONPATH=packages pytest tests/test_audio.py -v             # Single module
+PYTHONPATH=packages pytest tests/test_logic.py::test_name -v  # Single test
 ```
+
+Note: `pyproject.toml` sets `addopts = "-v --cov=torch9 --cov-report=term-missing"`, so coverage runs by default.
 
 ### Code Quality
+
 ```bash
-black packages/ examples/ tests/    # Format code
-isort packages/ examples/ tests/    # Sort imports
-flake8 packages/torch9              # Lint
-mypy packages/                      # Type check
+black packages/ tests/ examples/         # Format (line-length=100)
+isort packages/ tests/ examples/         # Sort imports (profile=black)
+flake8 packages/torch9                   # Lint (E9,F63,F7,F82 strict; max-complexity=10)
+mypy packages/torch9                     # Type check (may have non-blocking errors)
+```
+
+### Checking Before Commit (mirrors CI)
+
+```bash
+black --check packages/torch9 && isort --check-only packages/torch9 && flake8 packages/torch9 --select=E9,F63,F7,F82 --show-source && PYTHONPATH=packages pytest tests/ -v
 ```
 
 ## Code Style
 
-- **Formatter**: Black (line-length=100)
-- **Import sorter**: isort (profile=black)
-- **Python**: 3.8+ compatible
-- **Type hints**: Used throughout
+- **Black**: line-length=100, target py38-py311
+- **isort**: profile=black, line_length=100
+- **flake8**: strict on E9/F63/F7/F82, advisory max-complexity=10, max-line-length=127
+- **mypy**: python_version=3.8, warn_return_any=true, disallow_untyped_defs=false (permissive)
+- **Python**: 3.8+ compatible, type hints used throughout
+- All tool configs live in `pyproject.toml` (except flake8 which is configured in CI)
 
-## Architecture Notes
+## Architecture
 
-### Lazy Loading Pattern
-Submodules are imported on-demand via `__getattr__` in `packages/torch9/__init__.py`:
+### Lazy Loading
+
+Submodules load on first access via `__getattr__` in `packages/torch9/__init__.py`. Importing `torch9` is cheap; domains load only when referenced:
+
 ```python
-from torch9 import audio  # Only loads audio module when accessed
+import torch9          # Fast - no domain code loaded
+torch9.audio           # Loads audio module on first access
+from torch9 import vision  # Same lazy behavior
 ```
 
 ### Optional Dependencies
-Each domain has separate dependencies in `pyproject.toml`:
-- `torch9[audio]`, `torch9[vision]`, `torch9[text]`, `torch9[rl]`
-- `torch9[all]` for everything
-- `torch9[dev]` for development tools
 
-### Current Status
-- **Version**: 0.1.0 (Alpha)
-- **Tests**: 149 tests, 100% passing
-- **Coverage**: 74%
-- **Audio/Vision**: Real torchaudio/torchvision integrations with fallbacks
-- **Logic/Algo**: Full Tensor Logic & Master Algorithm frameworks
+Each domain has its own extras in `pyproject.toml`. Core requires only `torch>=2.0.0` and `numpy>=1.21.0`. Modules use try/except to fall back gracefully when optional deps are missing (e.g., `is_torchaudio_available()`).
 
-## Current Development Phase
+### Package Discovery
 
-### Completed
-1. Monorepo structure with 10 integrated modules
-2. Lazy loading architecture
-3. Comprehensive test suite (149 tests)
-4. CI/CD pipeline (GitHub Actions)
-5. Documentation (README, ARCHITECTURE, QUICKSTART)
-6. Original Torch7 integration (46 repos)
-7. Examples for multimodal, RL, and recommender workflows
-8. **Real torchaudio/torchvision integrations** with graceful fallbacks
-9. **Tensor Logic Framework** (torch9.logic):
-   - TensorSpec/ShapeSpec for validation
-   - TensorGuard decorators
-   - TensorOps (normalize, safe_divide, gumbel_softmax, etc.)
-   - DeviceManager for CPU/GPU handling
-   - MemoryTracker for GPU memory monitoring
-10. **Master Algorithm Framework** (torch9.algo):
-    - Algorithm base class with lifecycle management
-    - Pipeline for composable processing chains
-    - Step with caching and error handling
-    - Branch/Merge/Conditional/Loop flow control
-    - Registry for algorithm discovery
-    - Scheduler with priority-based execution
+setuptools finds packages via `[tool.setuptools.packages.find]` with `where = ["packages"]` and `include = ["torch9*"]`.
 
-### Next Phase
-1. **Implement remaining domain modules** (text, rl, rec, tune, data, codec)
-2. **Add benchmarking suite** for performance validation
-3. **Improve test coverage to 95%+**
-4. **Create migration guides** from individual packages to torch9
-5. **Add more pre-trained models** and weights support
+## Test Structure
 
-## Important Files
+| File | Tests | Scope |
+|------|-------|-------|
+| `test_torch9.py` | 11 | Core package, lazy loading, version |
+| `test_audio.py` | 15 | AudioTransform, MelSpectrogram, MFCC, utilities |
+| `test_vision.py` | 22 | ImageTransform, Compose, ResNet, model registry |
+| `test_text.py` | 6 | Tokenizer, TextDataset |
+| `test_rl.py` | 7 | Environment, Policy, Agent |
+| `test_data.py` | 9 | DataPipeline, DataLoader |
+| `test_logic.py` | 36 | TensorSpec, ShapeSpec, TensorOps, DeviceManager, MemoryTracker |
+| `test_algo.py` | 43 | Algorithm, Step, Pipeline, Scheduler, Registry, flow control |
+| `test_luatorch.py` | 115 | Typed tensors, Storage, nn modules, criteria, optimizers, serialization, utils |
 
-| File | Purpose |
-|------|---------|
-| `pyproject.toml` | Package config, dependencies, tool settings |
-| `packages/torch9/__init__.py` | Main package entry, lazy loading |
-| `tests/conftest.py` | Shared pytest fixtures |
-| `.github/workflows/tests.yml` | CI/CD pipeline |
-| `COMPLETION_SUMMARY.md` | Implementation status and next steps |
-| `TORCH_INTEGRATION_SUMMARY.md` | Torch7 integration details |
-
-## Testing Approach
-
-Each module has its own test file:
-- `test_torch9.py` - Core package tests (11 tests)
-- `test_audio.py` - Audio module tests (15 tests)
-- `test_vision.py` - Vision module tests (22 tests)
-- `test_text.py` - Text module tests (6 tests)
-- `test_rl.py` - RL module tests (7 tests)
-- `test_data.py` - Data module tests (9 tests)
-- `test_logic.py` - Tensor Logic tests (36 tests)
-- `test_algo.py` - Master Algorithm tests (43 tests)
-
-Run tests before committing:
-```bash
-PYTHONPATH=packages pytest tests/ -v
-```
+Shared fixtures in `tests/conftest.py`: `sample_tensor`, `sample_waveform`, `sample_text`, `sample_dataset`.
 
 ## CI/CD Pipeline
 
-GitHub Actions runs on push/PR:
-- **OS**: Ubuntu, macOS, Windows
-- **Python**: 3.8, 3.9, 3.10, 3.11
-- **Checks**: lint, format, type-check, tests, coverage
+GitHub Actions (`.github/workflows/tests.yml`) runs on push/PR to `main`/`develop`:
+- **Matrix**: Ubuntu + macOS + Windows, Python 3.8/3.9/3.10/3.11
+- **Steps**: flake8 lint -> black check -> isort check -> mypy (continue-on-error) -> pytest with coverage -> Codecov upload
 
 ## Common Tasks
 
-### Adding a new module feature
-1. Edit relevant `packages/torch9/<module>/__init__.py`
+### Adding a feature to an existing module
+1. Edit `packages/torch9/<module>/__init__.py`
 2. Add tests in `tests/test_<module>.py`
-3. Run `pytest` and `black`/`isort`
-4. Update docs if needed
+3. Run `black`, `isort`, then `pytest`
 
-### Integrating actual torch/* library
-1. Add real dependency to `pyproject.toml` optional-dependencies
-2. Replace stub implementation with actual library imports
-3. Add try/except for graceful degradation when dep not installed
-4. Update tests to use actual functionality
+### Replacing a stub with a real torch/* integration
+1. Add the real dependency to `[project.optional-dependencies]` in `pyproject.toml`
+2. In the module, import the real library inside try/except for graceful fallback
+3. Expose a helper like `is_<lib>_available()` to check at runtime
+4. Update tests to validate real functionality
 
-### Adding examples
-1. Create new file in `examples/`
-2. Follow existing patterns (multimodal_example.py)
-3. Use only torch9 imports, not underlying libraries directly
+### Adding a new example
+1. Create `examples/<name>_example.py`
+2. Use only `torch9` imports (not underlying libraries directly)
+3. Follow patterns from `examples/multimodal_example.py`
 
-## Notes
+## Key Files
 
-- Torch7 code in `torch/` is historical reference - don't modify
-- All 46 Torch7 repos have their .git directories removed
-- Current implementations are stubs demonstrating the API surface
-- Priority is replacing stubs with real torch/* integrations
+| File | Purpose |
+|------|---------|
+| `pyproject.toml` | Package metadata, dependencies, all tool configs |
+| `packages/torch9/__init__.py` | Package entry, lazy loading, version |
+| `tests/conftest.py` | Shared pytest fixtures |
+| `.github/workflows/tests.yml` | CI pipeline definition |
+| `setup.py` | Minimal wrapper delegating to pyproject.toml |
+
+## Current Status
+
+- **264 tests**, 100% pass rate
+- **audio/vision**: Real torchaudio/torchvision integrations with fallbacks
+- **logic/algo**: Full frameworks implemented (~2,000 LOC combined)
+- **luatorch**: Unified Torch7 core (~1,600 LOC) - typed tensors, nn module system, functional optimizers, criteria, serialization, utilities
+- **text/rl/rec/tune/data/codec**: Stub implementations demonstrating API surface
+- **Torch7**: 46 repos integrated as historical reference (do not modify)
+
+### Next Steps
+- Replace remaining stubs with real torch/* integrations
+- Add benchmarking suite
+- Improve coverage to 95%+
+- Create migration guides from individual packages

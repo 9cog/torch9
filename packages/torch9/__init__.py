@@ -12,6 +12,7 @@ This package provides a cohesive integration of PyTorch domain libraries includi
 - codec: Fast media encoding/decoding
 - logic: Tensor validation, type checking, and logical operations
 - algo: Master algorithm framework for composable ML pipelines
+- luatorch: Unified LuaTorch/Torch7 core (tensors, nn, optim, serialization)
 """
 
 __version__ = "0.1.0"
@@ -29,6 +30,7 @@ __all__ = [
     # Core frameworks
     "logic",
     "algo",
+    "luatorch",
 ]
 
 
