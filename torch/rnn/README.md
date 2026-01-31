@@ -10,6 +10,7 @@ This library includes documentation for the following objects :
   * [Sequencer criterion](doc/criterion.md) handle `input` and `target` sequences.
   * [Miscellaneous modules and criterions](doc/miscellaneous.md) for things like noise contrastive estimation (NCE) and zero-masking.
   * [Reinforce modules and criterions](doc/reinforce.md) implement the REINFORCE learning rule.
+  * [Reservoir Computing](doc/reservoir.md) implements Echo State Networks (ESN) based on reservoirpy.
 	
 	
 <a name='rnn.examples'></a>

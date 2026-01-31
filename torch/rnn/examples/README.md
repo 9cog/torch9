@@ -24,6 +24,7 @@ These scripts showcases the fundamental principles of the package.
  7. [encoder-decoder-coupling.lua](encoder-decoder-coupling.lua): uses two stacks of `nn.SeqLSTM` to implement an encoder and decoder. The final hidden state of the encoder initializes the hidden state of the decoder. Example of sequence-to-sequence learning.
  8. [nested-recurrence-lstm.lua](nested-recurrence-lstm.lua): demonstrates how RNNs can be nested to form complex RNNs.
  9. [recurrent-time-series.lua](recurrent-time-series.lua) demonstrates how train a simple RNN to do multi-variate time-series predication.
+ 10. [simple-reservoir-network.lua](simple-reservoir-network.lua): demonstrates the Reservoir Computing (Echo State Network) module for fast time-series prediction. Based on the reservoirpy Python library, this example shows how to use fixed random recurrent weights and train only the output layer.
 
  ## External resources
 
