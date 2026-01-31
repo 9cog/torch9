@@ -86,6 +86,9 @@ require('rnn.GRU')
 require('rnn.Mufuru')
 require('rnn.NormStabilizer')
 
+-- reservoir computing
+require('rnn.Reservoir')
+
 -- sequencer modules
 require('rnn.AbstractSequencer')
 require('rnn.Repeater')
