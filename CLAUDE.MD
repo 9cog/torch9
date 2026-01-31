@@ -9,7 +9,7 @@ Repository: https://github.com/9cog/torch9
 ## Directory Layout
 
 ```
-packages/torch9/          # Main Python package (10 modules, ~3,600 LOC)
+packages/torch9/          # Main Python package (11 modules, ~5,200 LOC)
   __init__.py             # Entry point with lazy loading via __getattr__
   audio/                  # torchaudio integration (MelSpectrogram, MFCC, Resample)
   vision/                 # torchvision integration (ResNet, VGG, EfficientNet, transforms)
@@ -21,8 +21,9 @@ packages/torch9/          # Main Python package (10 modules, ~3,600 LOC)
   codec/                  # torchcodec (VideoDecoder, AudioDecoder)
   logic/                  # Tensor Logic Framework (TensorSpec, TensorGuard, TensorOps, DeviceManager, MemoryTracker)
   algo/                   # Master Algorithm Framework (Algorithm, Pipeline, Step, Scheduler, Registry, Branch/Merge/Loop)
+  luatorch/               # Unified LuaTorch/Torch7 core (nn, optim, typed tensors, serialization)
 torch/                    # Original Torch7 (46 repos, ~274MB) - READ ONLY, historical reference
-tests/                    # 149 tests across 9 files (conftest.py + 8 test modules)
+tests/                    # 264 tests across 10 files (conftest.py + 9 test modules)
 examples/                 # 3 working examples (multimodal, RL, recommender)
 docs/                     # ARCHITECTURE.md, QUICKSTART.md
 .github/workflows/        # CI/CD (tests.yml)
@@ -106,6 +107,7 @@ setuptools finds packages via `[tool.setuptools.packages.find]` with `where = ["
 | `test_data.py` | 9 | DataPipeline, DataLoader |
 | `test_logic.py` | 36 | TensorSpec, ShapeSpec, TensorOps, DeviceManager, MemoryTracker |
 | `test_algo.py` | 43 | Algorithm, Step, Pipeline, Scheduler, Registry, flow control |
+| `test_luatorch.py` | 115 | Typed tensors, Storage, nn modules, criteria, optimizers, serialization, utils |
 
 Shared fixtures in `tests/conftest.py`: `sample_tensor`, `sample_waveform`, `sample_text`, `sample_dataset`.
 
@@ -145,9 +147,10 @@ GitHub Actions (`.github/workflows/tests.yml`) runs on push/PR to `main`/`develo
 
 ## Current Status
 
-- **149 tests**, 100% pass rate, 74% coverage
+- **264 tests**, 100% pass rate
 - **audio/vision**: Real torchaudio/torchvision integrations with fallbacks
 - **logic/algo**: Full frameworks implemented (~2,000 LOC combined)
+- **luatorch**: Unified Torch7 core (~1,600 LOC) - typed tensors, nn module system, functional optimizers, criteria, serialization, utilities
 - **text/rl/rec/tune/data/codec**: Stub implementations demonstrating API surface
 - **Torch7**: 46 repos integrated as historical reference (do not modify)
 
